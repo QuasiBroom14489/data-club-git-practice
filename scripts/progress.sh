@@ -49,15 +49,18 @@ while IFS= read -r user; do
 
   if grep -qx "$user" "$tmp/accepted"; then invite="accepted"; else invite="PENDING"; fi
 
+  # A merged pull request is the finish line, so report that ahead of anything
+  # else; then an open one; a closed one only if there is nothing better.
   pr="$(jq -r --arg u "$user" '
-    [ .[] | select((.author.login // "" | ascii_downcase) == $u) ]
-    | if length == 0 then "none opened"
-      else ( sort_by(.number) | last
-             | if .mergedAt != null then "MERGED (#\(.number))"
-               elif .state == "CLOSED" then "closed, not merged (#\(.number))"
-               elif .isDraft then "draft, open (#\(.number))"
-               else "open, awaiting review (#\(.number))" end )
-      end' "$tmp/prs.json" 2>/dev/null)"
+    [ .[] | select((.author.login // "" | ascii_downcase) == $u) ] as $mine
+    | ( [ $mine[] | select(.mergedAt != null) ] | sort_by(.number) | last ) as $merged
+    | ( [ $mine[] | select(.mergedAt == null and .state == "OPEN") ] | sort_by(.number) | last ) as $open
+    | ( [ $mine[] | select(.mergedAt == null and .state == "CLOSED") ] | sort_by(.number) | last ) as $closed
+    | if   $merged then "MERGED (#\($merged.number))"
+      elif $open   then ( if $open.isDraft then "draft, not ready (#\($open.number))"
+                          else "open, awaiting review (#\($open.number))" end )
+      elif $closed then "closed, not merged (#\($closed.number))"
+      else "none opened" end' "$tmp/prs.json" 2>/dev/null)"
   [ -n "$pr" ] || pr="none opened"
 
   if grep -qx "$user" "$tmp/cards"; then card="yes"; done_count=$((done_count + 1)); else card="-"; fi
