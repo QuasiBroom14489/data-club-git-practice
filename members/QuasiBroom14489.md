@@ -1,5 +1,5 @@
-# <Your name>
+# Zane Johnson
 
-- **GitHub username:** <your-username>
-- **Role I'm most interested in:** dbt Engineer | BI Engineer | Marketing Analyst
-- **Something I want to learn this semester:** <one line>
+- **GitHub username:** QuasiBroom14489
+- **Role I'm most interested in:** dbt Engineer
+- **Something I want to learn this semester:** How to structure a dbt project so ten people can work in it without stepping on each other.
