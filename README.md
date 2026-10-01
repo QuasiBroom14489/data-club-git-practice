@@ -590,3 +590,5 @@ It is these seven, in this order.
 ---
 
 <sub>Practice repo for the South Shore Analytics × ND Data Club project · Fall 2026 · no real data lives here</sub>
+
+<!-- infra PR path test -->
